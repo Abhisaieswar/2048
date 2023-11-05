@@ -125,7 +125,6 @@ export const moveRight = (grid) => {
       }
     }
     const newTiles = getModifiedTiles(rowTiles);
-    console.log(newTiles);
     for (let k = 0; k < newTiles.length; k++) {
       newGrid[i][3 - k] = newTiles[k];
     }

@@ -33,8 +33,6 @@ const App = () => {
       setIsSmallScreen(window.innerWidth <= 640);
     };
 
-    checkScreenWidth();
-
     window.addEventListener("resize", checkScreenWidth);
 
     window.addEventListener("keydown", handleKey);
@@ -63,14 +61,14 @@ const App = () => {
     }
 
     const { tile, row, col } = generateNewTile(storedTiles);
-    storedTiles[row][col] = tile;
-    localStorage.setItem("2048-board", JSON.stringify(storedTiles));
+          storedTiles[row][col] = tile;
+          localStorage.setItem("2048-board", JSON.stringify(storedTiles));
     setGrid(storedTiles);
   };
 
   if (grid.length === 0) return <div>Loading</div>;
 
-  return (
+    return (
     <div className="h-screen bg-gray-800 font-bold flex justify-center">
       <div
         style={{ backgroundColor: "#bbada0" }}

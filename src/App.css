@@ -1,23 +1,12 @@
-/* .tile {
-  transition: transform 2s ease-in-out;
-  animation: show 500ms ease-in-out;
-}
-
-@keyframes show {
-  0% {
-    opacity: 0.5;
-    transform: scale(1);
-  }
-} */
 
 .tile {
-  animation: show 200ms ease-in-out;
+  animation: show 200ms  ease-out;
   transition: 100ms ease-in-out;
 }
 
 @keyframes show {
   0% {
     opacity: 0.5;
-    transform: scale(1);
+    transform: scale(1.25);
   }
 }

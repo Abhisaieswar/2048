@@ -3,7 +3,6 @@ import { getPositions, getTileColorClass } from "../helper/helper";
 const Tile = ({ tileData }) => {
   const { tile, row, col } = tileData;
   const { topPosition, leftPosition } = getPositions(row, col);
-  console.log(topPosition, leftPosition);
   const tileColorClass = getTileColorClass(tile.value);
   return (
     <>
