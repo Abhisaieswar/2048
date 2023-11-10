@@ -58,6 +58,7 @@ const getModifiedTiles = (tilesString) => {
 };
 
 export const moveUp = (grid) => {
+  let isSame=true
   const newGrid = getEmptyGrid();
 
   for (let i = 0; i < 4; i++) {
@@ -68,14 +69,17 @@ export const moveUp = (grid) => {
       }
     }
     const newTiles = getModifiedTiles(colTiles);
+    isSame = isSame && JSON.stringify(newTiles.map((tile)=>tile.value)) === JSON.stringify(colTiles) && [0,4].includes(newTiles.length)
     for (let k = 0; k < newTiles.length; k++) {
       newGrid[k][i] = newTiles[k];
     }
   }
 
-  return newGrid;
+  return {newGrid,isSame};
 };
+
 export const moveDown = (grid) => {
+  let isSame=true
   const newGrid = getEmptyGrid();
 
   for (let i = 0; i < 4; i++) {
@@ -86,15 +90,17 @@ export const moveDown = (grid) => {
       }
     }
     const newTiles = getModifiedTiles(colTiles);
+    isSame = isSame && JSON.stringify(newTiles.map((tile)=>tile.value)) === JSON.stringify(colTiles) && [0,4].includes(newTiles.length)
     for (let k = 0; k < newTiles.length; k++) {
       newGrid[3 - k][i] = newTiles[k];
     }
   }
 
-  return newGrid;
+  return {newGrid,isSame};
 };
 
 export const moveLeft = (grid) => {
+  let isSame=true
   const newGrid = getEmptyGrid();
 
   for (let i = 0; i < 4; i++) {
@@ -106,15 +112,17 @@ export const moveLeft = (grid) => {
     }
 
     const newTiles = getModifiedTiles(rowTiles);
+    isSame = isSame && JSON.stringify(newTiles.map((tile)=>tile.value)) === JSON.stringify(rowTiles) && [0,4].includes(newTiles.length)
     for (let k = 0; k < newTiles.length; k++) {
       newGrid[i][k] = newTiles[k];
     }
   }
 
-  return newGrid;
+  return {newGrid,isSame};
 };
 
 export const moveRight = (grid) => {
+  let isSame=true
   const newGrid = getEmptyGrid();
 
   for (let i = 0; i < 4; i++) {
@@ -125,12 +133,13 @@ export const moveRight = (grid) => {
       }
     }
     const newTiles = getModifiedTiles(rowTiles);
+    isSame = isSame && JSON.stringify(newTiles.map((tile)=>tile.value)) === JSON.stringify(rowTiles) && [0,4].includes(newTiles.length)
     for (let k = 0; k < newTiles.length; k++) {
       newGrid[i][3 - k] = newTiles[k];
     }
   }
 
-  return newGrid;
+  return {newGrid,isSame};
 };
 
 export const getPositions = (row, col) => {
@@ -187,3 +196,13 @@ export const generateInitialTiles = () => {
   };
   return tiles;
 };
+
+export const isGameOver=(grid)=>{
+  const moves=[moveLeft,moveRight,moveDown,moveUp];
+  for(let move of moves) {
+    const {newGrid}=move(grid);
+    const { _, row, col } = generateNewTile(newGrid);
+    if(row!==undefined && col!==undefined)  return false
+  }
+  return true
+}

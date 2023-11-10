@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import {
   generateInitialTiles,
   moveUp,
@@ -7,27 +7,30 @@ import {
   moveLeft,
   moveRight,
   generateNewTile,
+  isGameOver
 } from "./helper/helper";
 import Tile from "./components/Tile.js";
 
 const App = () => {
   const [grid, setGrid] = useState([]);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
+  const storedTiles=useRef([])
+  const gameOver=useRef(false)
 
   const emptyGrid = Array(16).fill(0);
-  let storedTiles;
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    storedTiles = JSON.parse(localStorage.getItem("2048-board"));
-    if (!storedTiles) {
+    storedTiles.current = JSON.parse(localStorage.getItem("2048-board"))
+    gameOver.current=JSON.parse(localStorage.getItem("game-over"))
+    if (storedTiles.current.length===0) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      storedTiles = generateInitialTiles();
+      storedTiles.current = generateInitialTiles();
 
-      localStorage.setItem("2048-board", JSON.stringify(storedTiles));
+      localStorage.setItem("2048-board", JSON.stringify(storedTiles.current));
+      localStorage.setItem("game-over",JSON.stringify(false))
     }
-    setGrid(storedTiles);
+    setGrid(storedTiles.current);
 
     const checkScreenWidth = () => {
       setIsSmallScreen(window.innerWidth <= 640);
@@ -43,33 +46,66 @@ const App = () => {
     };
   }, []);
 
+  const updateGrid=(newGrid)=>{
+    storedTiles.current=newGrid;
+    setGrid(newGrid);
+  }
+
   const handleKey = (e) => {
+    console.log(gameOver.current)
+    if(gameOver.current)  return
     if (e.key === "ArrowUp") {
-      storedTiles = moveUp(storedTiles);
-      setGrid(storedTiles);
+      const {newGrid,isSame}=moveUp(storedTiles.current);
+      if(isSame) return
+      updateGrid(newGrid)
     } else if (e.key === "ArrowDown") {
-      storedTiles = moveDown(storedTiles);
-      setGrid(storedTiles);
+      const {newGrid,isSame}=moveDown(storedTiles.current);
+      if(isSame) return
+      updateGrid(newGrid)
     } else if (e.key === "ArrowLeft") {
-      storedTiles = moveLeft(storedTiles);
-      setGrid(storedTiles);
+      const {newGrid,isSame}=moveLeft(storedTiles.current);
+      if(isSame) return
+      updateGrid(newGrid)
     } else if (e.key === "ArrowRight") {
-      storedTiles = moveRight(storedTiles);
-      setGrid(storedTiles);
+      const {newGrid,isSame}=moveRight(storedTiles.current);
+      if(isSame) return
+      updateGrid(newGrid)
     } else {
       return;
     }
-
-    const { tile, row, col } = generateNewTile(storedTiles);
-          storedTiles[row][col] = tile;
-          localStorage.setItem("2048-board", JSON.stringify(storedTiles));
-    setGrid(storedTiles);
+    
+    const { tile, row, col } = generateNewTile(storedTiles.current);
+    storedTiles.current[row][col] = tile;
+    localStorage.setItem("2048-board", JSON.stringify(storedTiles.current));
+    setGrid(storedTiles.current);
+    
+    if(isGameOver(storedTiles.current)){
+      gameOver.current=true
+      localStorage.setItem("game-over",JSON.stringify(true))
+    }
   };
+
+  const startNewGame=()=>{
+    storedTiles.current = generateInitialTiles();
+    gameOver.current=false
+    setGrid(storedTiles.current)
+    localStorage.setItem("2048-board", JSON.stringify(storedTiles.current));
+    localStorage.setItem("game-over",JSON.stringify(false))
+  }
 
   if (grid.length === 0) return <div>Loading</div>;
 
-    return (
-    <div className="h-screen bg-gray-800 font-bold flex justify-center">
+  return (
+    <div className="h-screen bg-gray-800 font-bold flex flex-col justify-center items-center">
+      {
+        gameOver.current && 
+        <div className="flex flex-col justify-center items-center">
+            <div className="text-white">
+              Game Over!
+            </div>
+        </div>
+      }
+      <button className="h-10 w-40 bg-blue-300" onClick={startNewGame}>New Game</button>
       <div
         style={{ backgroundColor: "#bbada0" }}
         className="sm:h-[550px] sm:w-[550px] h-[300px] w-[300px] flex justify-between flex-wrap p-3 rounded-md relative mt-[50px]"
