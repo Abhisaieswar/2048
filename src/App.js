@@ -13,7 +13,7 @@ import Tile from "./components/Tile.js";
 
 const App = () => {
   const [grid, setGrid] = useState([]);
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
   const storedTiles=useRef([])
   const gameOver=useRef(false)
 
@@ -32,17 +32,18 @@ const App = () => {
     }
     setGrid(storedTiles.current);
 
-    const checkScreenWidth = () => {
-      setIsSmallScreen(window.innerWidth <= 640);
-    };
 
-    window.addEventListener("resize", checkScreenWidth);
 
     window.addEventListener("keydown", handleKey);
 
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchend', handleTouchEnd);
+
     return () => {
-      window.removeEventListener("resize", checkScreenWidth);
       window.removeEventListener("keydown", handleKey);
+
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
 
@@ -50,6 +51,30 @@ const App = () => {
     storedTiles.current=newGrid;
     setGrid(newGrid);
   }
+
+  const handleSwipe = (touchEnd) => {
+    const deltaX = touchEnd.x - touchStart.x;
+    const deltaY = touchEnd.y - touchStart.y;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (Math.max(absX, absY) > 30) {
+      if (absX > absY) {
+        deltaX > 0 ? handleKey({key:"ArrowRight"}) : handleKey({key:"ArrowLeft"})
+      } else {
+        deltaY > 0 ? handleKey({key:"ArrowDown"}) : handleKey({key:"ArrowUp"})
+      }
+    }
+  }
+
+  const handleTouchStart = (event) => {
+    setTouchStart({ x: event.touches[0].clientX, y: event.touches[0].clientY });
+  };
+
+  const handleTouchEnd = (event) => {
+    const touchEnd = { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY };
+    handleSwipe(touchEnd);
+  };
 
   const handleKey = (e) => {
     console.log(gameOver.current)
