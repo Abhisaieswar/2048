@@ -21,7 +21,7 @@ const App = () => {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    storedTiles.current = JSON.parse(localStorage.getItem("2048-board"))
+    storedTiles.current = JSON.parse(localStorage.getItem("2048-board")) || []
     gameOver.current=JSON.parse(localStorage.getItem("game-over"))
     if (storedTiles.current.length===0) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
